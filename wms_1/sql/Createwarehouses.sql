@@ -32,16 +32,16 @@ CREATE TABLE warehouse (
     w_name VARCHAR(50) NOT NULL,                        -- 창고명
     location VARCHAR(255) NOT NULL,                     -- 소재지
     location_id TINYINT UNSIGNED NOT NULL,              -- 주소코드 (Foreign Key)
-    total_area_sqm DECIMAL(10,2) NOT NULL,              -- 창고총면적
-    general_w_sqm DECIMAL(10,2) DEFAULT NULL,           -- 일반창고면적
-    cold_w_sqm DECIMAL(10,2) DEFAULT NULL,              -- 냉동냉장창고면적
-    storage_w_sqm DECIMAL(10,2) DEFAULT NULL,           -- 보관장소면적
-    port_w_sqm DECIMAL(10,2) DEFAULT NULL,              -- 항만창고면적
-    bonded_w_sqm DECIMAL(10,2) DEFAULT NULL,            -- 관세법>보세창고면적
-    chemical_w_sqm DECIMAL(10,2) DEFAULT NULL,          -- 화학물질관리법>보관저장업면적
-    food_cold_w_sqm DECIMAL(10,2) DEFAULT NULL,         -- 식품위생법>냉동냉장면적
-    livestock_w_sqm DECIMAL(10,2) DEFAULT NULL,         -- 축산물위생법>축산물보관면적
-    marine_cold_w_sqm DECIMAL(10,2) DEFAULT NULL,       -- 수산식품산업법>냉동냉장면적
+    total_area_sqm FLOAT NOT NULL,              -- 창고총면적
+    general_w_sqm FLOAT DEFAULT NULL,           -- 일반창고면적
+    cold_w_sqm FLOAT DEFAULT NULL,              -- 냉동냉장창고면적
+    storage_w_sqm FLOAT DEFAULT NULL,           -- 보관장소면적
+    port_w_sqm FLOAT DEFAULT NULL,              -- 항만창고면적
+    bonded_w_sqm FLOAT DEFAULT NULL,            -- 관세법>보세창고면적
+    chemical_w_sqm FLOAT DEFAULT NULL,          -- 화학물질관리법>보관저장업면적
+    food_cold_w_sqm FLOAT DEFAULT NULL,         -- 식품위생법>냉동냉장면적
+    livestock_w_sqm FLOAT DEFAULT NULL,         -- 축산물위생법>축산물보관면적
+    marine_cold_w_sqm FLOAT DEFAULT NULL,       -- 수산식품산업법>냉동냉장면적
     related_law ENUM('관세법', '물류시설법', '물류시설법(항만)', '수산식품산업법', '식품위생법', '축산물위생법', '화학물질관리법') NOT NULL DEFAULT '물류시설법', -- 관련법률
     handled_items VARCHAR(100) DEFAULT NULL,                -- 취급품목
     manager VARCHAR(10) NOT NULL,                      		-- 대표자 (Foreign Key)
@@ -60,26 +60,24 @@ alter table warehouse add constraint fk_location_id foreign key(location_id) ref
 
 drop table sub_warehouse;
 create table sub_warehouse (
-	ws_id smallint unsigned not null auto_increment,
-    ws_type enum('물류시설법 일반창고', '물류시설법 냉동냉장',  '물류시설법 보관장소', '항만창고', '관세법 보세창고','화학물질관리법 보관저장업', '식품위생법 냉동냉장', '축산물위생법 축산물보관', '수산식품산업법 냉동냉장') not null default '물류시설법 일반창고',
-    ws_area_sqm decimal(10,2) default null,
-    ws_w_sqm decimal(10,2) default null,
-    ws_height decimal(10,2) default null,
+	sw_id smallint unsigned not null auto_increment,
+    sw_type enum('물류시설법 일반창고', '물류시설법 냉동냉장',  '물류시설법 보관장소', '항만창고', '관세법 보세창고','화학물질관리법 보관저장업', '식품위생법 냉동냉장', '축산물위생법 축산물보관', '수산식품산업법 냉동냉장') not null default '물류시설법 일반창고',
+    sw_area_sqm FLOAT default null,
+    sw_w_sqm FLOAT default null,
+    sw_height FLOAT default null,
     w_id smallint unsigned not null,
-    primary key(ws_id)
+    primary key(sw_id)
 );
 alter table sub_warehouse add constraint fk_w_id foreign key(w_id) references warehouse(w_id);
 
 
 
-drop table ssw_warehouse;
-create table ssw_warehouse(
+drop table ss_warehouse;
+create table ss_warehouse(
 	ssw_id int unsigned not null auto_increment,
-    rent_fee_6m decimal(12,2) default null,
-    rent_fee_12m decimal(12,2) default null,
-    ws_id smallint unsigned not null,
+    rent_fee_6m FLOAT default null,
+    rent_fee_12m FLOAT default null,
+    sw_id smallint unsigned not null,
     primary key(ssw_id)
 );
-alter table ssw_warehouse add constraint fk_ws_id foreign key(ws_id) references sub_warehouse(ws_id);
-
-
+alter table ss_warehouse add constraint fk_sw_id foreign key(sw_id) references sub_warehouse(sw_id);
